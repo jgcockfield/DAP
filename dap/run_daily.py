@@ -31,15 +31,18 @@ def main() -> int:
     try:
         cfg = load_sheets_config()
 
-        prospects = read_all_prospects(cfg)
-        _contacted = read_contacted_emails([r for r in prospects if r.get("url")])
+        prospects = read_all_prospects(cfg) if prospects else "no prospects")
+        _contacted = read_contacted_emails([r for r in prospects if r.get("website_url")])
 
         # normalize prospects into crawl items
-        crawl_items = [{'url': row.get('url')} for row in prospects if row.get('url')]
+        crawl_items = [{'url': row.get('website_url')} for row in prospects if row.get('website_url')]
         urls_seeded_count = len(crawl_items)
 
         # crawl step (stub)
-        crawl_results = crawl_urls(crawl_items)
+        if not args.dry_run:
+            crawl_results = crawl_urls(crawl_items)
+        else:
+            crawl_results = []
         sites_scraped_count = len(crawl_results)
 
         finished_at = utc_now_iso()
