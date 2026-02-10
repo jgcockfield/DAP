@@ -22,6 +22,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dry-run", action="store_true", help="Run without external side effects.")
     parser.add_argument("--no-email", action="store_true", help="Skip email stage (placeholder for now).")
+    parser.add_argument("--limit", type=int, default=0, help="Limit number of URLs to crawl (0 = no limit).")
     args = parser.parse_args()
 
     run_id = str(uuid.uuid4())
@@ -42,6 +43,10 @@ def main() -> int:
         # normalize prospects into crawl items
         crawl_items = [{'url': row.get('website_url')} for row in prospects if row.get('website_url')]
         urls_seeded_count = len(crawl_items)
+
+        if args.limit > 0:
+            crawl_items = crawl_items[:args.limit]
+            urls_seeded_count = len(crawl_items)
 
         # crawl step (stub)
         if not args.dry_run:
