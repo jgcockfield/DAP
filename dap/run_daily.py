@@ -82,6 +82,7 @@ def main() -> int:
         else:
             print("[DRY-RUN] would append runs log row")
 
+        print(f"seeded={urls_seeded_count} scraped={sites_scraped_count} enriched={enriched_count} written={written_count} emailed={emails_sent_count}")
         print(f"run_id={run_id} dry_run={args.dry_run} prospects_rows={len(prospects)}")
         return 0
 
