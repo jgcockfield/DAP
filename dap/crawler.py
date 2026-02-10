@@ -20,15 +20,22 @@ def run(items, timeout_s: int = 10):
             with urllib.request.urlopen(req, timeout=timeout_s) as resp:
                 html = resp.read().decode("utf-8", errors="ignore")
 
+                # strip scripts and styles
                 html = re.sub(r"<script.*?>.*?</script>", "", html, flags=re.S | re.I)
                 html = re.sub(r"<style.*?>.*?</style>", "", html, flags=re.S | re.I)
 
+                # extract visible text
+                text = re.sub(r"<[^>]+>", " ", html)
+                text = re.sub(r"\s+", " ", text).strip()
+
+                # extract title
                 title = ""
                 start = html.lower().find("<title>")
                 end = html.lower().find("</title>")
                 if start != -1 and end != -1 and end > start:
                     title = html[start + 7 : end].strip()
 
+                # extract meta description
                 description = ""
                 marker = 'name="description"'
                 idx = html.lower().find(marker)
@@ -45,6 +52,7 @@ def run(items, timeout_s: int = 10):
                     "status": resp.status,
                     "title": title,
                     "description": description,
+                    "text": text,
                     "html": html,
                 })
         except urllib.error.HTTPError as e:
