@@ -91,3 +91,7 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+from dap.crawler import run as crawl_urls
+
+# crawl step\ncrawl_results = crawl_urls(prospects)
