@@ -1,5 +1,3 @@
-# dap/run_daily.py
-
 from __future__ import annotations
 
 import argparse
@@ -9,6 +7,8 @@ from datetime import datetime
 from dap.sheets.client import load_sheets_config
 from dap.sheets.readers import read_all_prospects, read_contacted_emails
 from dap.sheets.writers import append_run_log
+from dap.crawler import run as crawl_urls
+import traceback
 
 
 def utc_now_iso() -> str:
@@ -35,9 +35,13 @@ def main() -> int:
 
         prospects = read_all_prospects(cfg)
         urls_seeded_count = len(prospects)
-        _contacted = read_contacted_emails(prospects)
+        _contacted = read_contacted_emails([r for r in prospects if r.get("url")])
 
-        # Future stages: discovery, scraping, enrichment, email
+        # normalize prospects into crawl items
+        crawl_items = [{'url': row.get('url')} for row in prospects if row.get('url')]
+
+        # crawl step (stub)
+        crawl_results = crawl_urls(crawl_items)
 
         finished_at = utc_now_iso()
 
@@ -62,6 +66,7 @@ def main() -> int:
         return 0
 
     except Exception as e:
+        print(traceback.format_exc())
         errors_count += 1
         top_error = str(e)
         finished_at = utc_now_iso()
@@ -91,11 +96,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-from dap.crawler import run as crawl_urls
-
-# crawl step\ncrawl_results = crawl_urls(prospects)
-
-# normalize prospects\ncrawl_items = [{'url': row['url']} for row in prospects]
-
-crawl_results = crawl_urls(crawl_items)
