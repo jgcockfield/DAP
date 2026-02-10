@@ -9,6 +9,10 @@ from dap.sheets.readers import read_all_prospects, read_contacted_emails
 from dap.sheets.writers import append_run_log
 from dap.crawler import run as crawl_urls
 
+from dap.enrich import enrich
+from dap.sheets.writers_enrich import apply_enrichment
+
+
 def utc_now_iso() -> str:
     return datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 
@@ -44,6 +48,11 @@ def main() -> int:
         else:
             crawl_results = []
         sites_scraped_count = len(crawl_results)
+
+        updates = enrich(prospects, crawl_results)
+
+        if not args.dry_run:
+            apply_enrichment(cfg, updates)
 
         finished_at = utc_now_iso()
 
