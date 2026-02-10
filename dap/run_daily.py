@@ -51,6 +51,7 @@ def main() -> int:
         sites_scraped_count = len(crawl_results)
 
         updates = enrich(prospects, crawl_results)
+        enriched_count = len(updates)
 
         if not args.dry_run:
             apply_enrichment(cfg, updates)
@@ -69,7 +70,7 @@ def main() -> int:
                     "started_at": started_at,
                     "finished_at": finished_at,
                     "urls_seeded_count": str(urls_seeded_count),
-                    "sites_scraped_count": str(sites_scraped_count),
+                    "sites_scraped_count": str(sites_scraped_count),                    "enriched_count": str(enriched_count),
                     "emails_sent_count": str(emails_sent_count),
                     "errors_count": str(errors_count),
                     "top_error": top_error,
