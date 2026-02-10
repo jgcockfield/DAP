@@ -11,6 +11,7 @@ from dap.crawler import run as crawl_urls
 
 from dap.enrich import enrich
 from dap.sheets.writers_enrich import apply_enrichment
+from dap.email import send_emails
 
 
 def utc_now_iso() -> str:
