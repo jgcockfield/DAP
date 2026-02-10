@@ -37,7 +37,7 @@ def main() -> int:
         cfg = load_sheets_config()
 
         prospects = read_all_prospects(cfg)
-        _contacted = read_contacted_emails([r for r in prospects if r.get("website_url")])
+        contacted_emails = set(read_contacted_emails([r for r in prospects if r.get("website_url")]))
 
         # normalize prospects into crawl items
         crawl_items = [{'url': row.get('website_url')} for row in prospects if row.get('website_url')]
@@ -54,6 +54,10 @@ def main() -> int:
 
         if not args.dry_run:
             apply_enrichment(cfg, updates)
+
+        # email stage
+        if not args.dry_run and not args.no_email:
+            emails_sent_count = send_emails(cfg, prospects, updates, contacted_emails)
 
         finished_at = utc_now_iso()
 
