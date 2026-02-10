@@ -17,7 +17,8 @@ def run(items, timeout_s: int = 10):
 
         try:
             with urllib.request.urlopen(req, timeout=timeout_s) as resp:
-                results.append({"url": url, "status": resp.status})
+                html = resp.read().decode("utf-8", errors="ignore")
+                results.append({"url": url, "status": resp.status, "html": html})
         except urllib.error.HTTPError as e:
             results.append({"url": url, "status": e.code})
         except Exception as e:
