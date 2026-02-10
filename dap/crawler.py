@@ -25,10 +25,22 @@ def run(items, timeout_s: int = 10):
                 if start != -1 and end != -1 and end > start:
                     title = html[start + 7 : end].strip()
 
+                description = ""
+                marker = 'name="description"'
+                idx = html.lower().find(marker)
+                if idx != -1:
+                    content_idx = html.lower().find('content=', idx)
+                    if content_idx != -1:
+                        quote = html[content_idx + 8]
+                        endq = html.find(quote, content_idx + 9)
+                        if endq != -1:
+                            description = html[content_idx + 9 : endq].strip()
+
                 results.append({
                     "url": url,
                     "status": resp.status,
                     "title": title,
+                    "description": description,
                     "html": html,
                 })
         except urllib.error.HTTPError as e:
