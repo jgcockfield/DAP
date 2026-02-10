@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import urllib.request
 import urllib.error
+import re
 
 from dap.crawl_config import USER_AGENT
 
@@ -18,6 +19,9 @@ def run(items, timeout_s: int = 10):
         try:
             with urllib.request.urlopen(req, timeout=timeout_s) as resp:
                 html = resp.read().decode("utf-8", errors="ignore")
+
+                html = re.sub(r"<script.*?>.*?</script>", "", html, flags=re.S | re.I)
+                html = re.sub(r"<style.*?>.*?</style>", "", html, flags=re.S | re.I)
 
                 title = ""
                 start = html.lower().find("<title>")
