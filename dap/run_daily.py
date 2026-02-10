@@ -40,6 +40,7 @@ def main() -> int:
 
         # crawl step (stub)
         crawl_results = crawl_urls(crawl_items)
+        sites_scraped_count = len(crawl_results)
 
         finished_at = utc_now_iso()
 
