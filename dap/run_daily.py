@@ -95,3 +95,7 @@ if __name__ == "__main__":
 from dap.crawler import run as crawl_urls
 
 # crawl step\ncrawl_results = crawl_urls(prospects)
+
+# normalize prospects\ncrawl_items = [{'url': row['url']} for row in prospects]
+
+crawl_results = crawl_urls(crawl_items)
