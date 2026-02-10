@@ -31,7 +31,7 @@ def main() -> int:
     try:
         cfg = load_sheets_config()
 
-        prospects = read_all_prospects(cfg) if prospects else "no prospects")
+        prospects = read_all_prospects(cfg)
         _contacted = read_contacted_emails([r for r in prospects if r.get("website_url")])
 
         # normalize prospects into crawl items
@@ -68,7 +68,6 @@ def main() -> int:
         return 0
 
     except Exception as e:
-        
         errors_count += 1
         top_error = str(e)
         finished_at = utc_now_iso()
