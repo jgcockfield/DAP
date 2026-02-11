@@ -53,7 +53,7 @@ def main() -> int:
             crawl_results = crawl_urls(crawl_items)
         else:
             crawl_results = []
-        sites_scraped_count = len(crawl_results)
+        sites_scraped_count = len([r for r in crawl_results if isinstance(r, dict)])
 
         updates = enrich(prospects, crawl_results) if crawl_results else []
         enriched_count = len(updates)
