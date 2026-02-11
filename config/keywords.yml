@@ -1,0 +1,10 @@
+packs:
+  - name: expat_consultant_us
+    enabled: true
+    keywords:
+      - "expat consultant"
+      - "relocation consultant"
+      - "immigration attorney"
+    geo:
+      - "New Orleans"
+      - "Louisiana"

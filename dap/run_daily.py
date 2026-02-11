@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 
 from dap.sheets.client import load_sheets_config
 from dap.sheets.readers import read_all_prospects, read_contacted_emails
-from dap.sheets.writers import append_run_log
+from dap.sheets.writers import append_run_log, upsert_prospects
 from dap.crawler import run as crawl_urls
 
 from dap.enrich import enrich
@@ -40,8 +40,39 @@ def main() -> int:
     try:
         cfg = load_sheets_config()
 
+        # Phase 1: Discovery (stub wiring)
+        from dap.discovery.search_seed import discover
+        discovered = discover(cfg, dry_run=args.dry_run)
+        print(f"discovered={len(discovered)}")
+
         prospects = read_all_prospects(cfg)
-        contacted_emails = set(read_contacted_emails([r for r in prospects if r.get("website_url")]))
+
+        # Phase 1b: Seed discovered domains into prospects (domain-level dedupe)
+        existing_domains = {(p.get("domain", "") or "").strip().lower() for p in prospects if (p.get("domain", "") or "").strip()}
+
+        rows_to_seed = []
+        for d in discovered:
+            dom = (d.get("domain", "") or "").strip().lower()
+            if not dom or dom in existing_domains:
+                continue
+
+            rows_to_seed.append(
+                {
+                    "domain": dom,
+                    "website_url": d.get("url", ""),
+                    "source_keyword": d.get("source_keyword", ""),
+                    "status": "discovered",
+                    "notes": f"seeded via serper query={d.get('query', '')}",
+                }
+            )
+
+        if args.dry_run:
+            seeded_count = len(rows_to_seed)
+        else:
+            seeded_count = upsert_prospects(cfg, rows_to_seed, key="domain")
+
+        print(f"seeded_discovery={seeded_count}")
+        contacted_emails = set(read_contacted_emails(prospects))
 
         # normalize prospects into crawl items
         crawl_items = [{"url": row.get("website_url"), "domain": (row.get("domain") or "")} for row in prospects if row.get("website_url")]
@@ -103,7 +134,7 @@ def main() -> int:
         else:
             print("[DRY-RUN] would append runs log row")
 
-        print(f"seeded={urls_seeded_count} scraped={sites_scraped_count} enriched={enriched_count} written={written_count} emailed={emails_sent_count}")
+        print(f"seeded={seeded_count} scraped={sites_scraped_count} enriched={enriched_count} written={written_count} emailed={emails_sent_count}")
         print(f"run_id={run_id} dry_run={args.dry_run} prospects_rows={len(prospects)}")
         return 0
 
