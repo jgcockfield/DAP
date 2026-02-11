@@ -72,6 +72,10 @@ def main() -> int:
             seeded_count = upsert_prospects(cfg, rows_to_seed, key="domain")
 
         print(f"seeded_discovery={seeded_count}")
+
+        # Reload prospects so newly seeded rows enter crawl phase
+        if not args.dry_run and seeded_count > 0:
+            prospects = read_all_prospects(cfg)
         contacted_emails = set(read_contacted_emails(prospects))
 
         # normalize prospects into crawl items
