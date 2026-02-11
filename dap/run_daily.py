@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import uuid
 from datetime import datetime
+from urllib.parse import urlparse
 
 from dap.sheets.client import load_sheets_config
 from dap.sheets.readers import read_all_prospects, read_contacted_emails
@@ -41,7 +42,21 @@ def main() -> int:
         contacted_emails = set(read_contacted_emails([r for r in prospects if r.get("website_url")]))
 
         # normalize prospects into crawl items
-        crawl_items = [{'url': row.get('website_url')} for row in prospects if row.get('website_url')]
+        crawl_items = [{"url": row.get("website_url"), "domain": (row.get("domain") or "")} for row in prospects if row.get("website_url")]
+
+        # Phase 2.x: domain-level dedupe before crawling
+        _seen = set()
+        _deduped = []
+        for it in crawl_items:
+            dom = (it.get("domain") or "").strip().lower()
+            if not dom:
+                dom = urlparse(it["url"]).netloc.strip().lower()
+            key = dom or it["url"].strip().lower()
+            if key in _seen:
+                continue
+            _seen.add(key)
+            _deduped.append({"url": it["url"]})
+        crawl_items = _deduped
         urls_seeded_count = len(crawl_items)
 
         if args.limit > 0:
