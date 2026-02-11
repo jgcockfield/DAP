@@ -34,6 +34,8 @@ def main() -> int:
     emails_sent_count = 0
     errors_count = 0
     top_error = ""
+    enriched_count = 0
+    written_count = 0
 
     try:
         cfg = load_sheets_config()
@@ -57,11 +59,11 @@ def main() -> int:
             _seen.add(key)
             _deduped.append({"url": it["url"], "domain": dom})
         crawl_items = _deduped
-        urls_seeded_count = len(crawl_items)
 
         if args.limit > 0:
             crawl_items = crawl_items[:args.limit]
-            urls_seeded_count = len(crawl_items)
+
+        urls_seeded_count = len(crawl_items)
 
         # crawl step (stub)
         if not args.dry_run:
@@ -72,7 +74,6 @@ def main() -> int:
 
         updates = enrich(prospects, crawl_results) if crawl_results else []
         enriched_count = len(updates)
-        written_count = 0
 
         if not args.dry_run:
             written_count = apply_enrichment(cfg, updates)
