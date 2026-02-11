@@ -55,7 +55,7 @@ def main() -> int:
             crawl_results = []
         sites_scraped_count = len(crawl_results)
 
-        updates = enrich(prospects, crawl_results)
+        updates = enrich(prospects, crawl_results) if crawl_results else []
         enriched_count = len(updates)
         written_count = 0
 
