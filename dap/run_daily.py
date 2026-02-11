@@ -55,7 +55,7 @@ def main() -> int:
             if key in _seen:
                 continue
             _seen.add(key)
-            _deduped.append({"url": it["url"]})
+            _deduped.append({"url": it["url"], "domain": dom})
         crawl_items = _deduped
         urls_seeded_count = len(crawl_items)
 
