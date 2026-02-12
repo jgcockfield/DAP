@@ -1,10 +1,16 @@
 packs:
-  - name: expat_consultant_us
+  - name: costa_rica_relocation_partners
     enabled: true
     keywords:
       - "expat consultant"
-      - "relocation consultant"
-      - "immigration attorney"
+      - "expat relocation"
+      - "residency assistance"
+      - "residency advisor"
+      - "immigration lawyer"
+      - "digital nomad visa help"
+      - "international relocation"
     geo:
       - "New Orleans"
       - "Louisiana"
+      - "Costa Rica"
+ 

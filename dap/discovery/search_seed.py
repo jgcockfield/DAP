@@ -61,6 +61,56 @@ def _domain_from_url(url: str) -> str:
     return host
 
 
+def _is_blocked_domain(domain: str) -> bool:
+    d = (domain or "").strip().lower()
+    if not d:
+        return True
+
+    blocked = {
+        # directories / aggregators
+        "yelp.com",
+        "m.yelp.com",
+        "linkedin.com",
+        "indeed.com",
+        "bbb.org",
+        "facebook.com",
+        "instagram.com",
+        "google.com",
+        "maps.google.com",
+        "justia.com",
+        "ailalawyer.com",
+        "immigrationadvocates.org",
+        "law.cornell.edu",
+        "lawyers.law.cornell.edu",
+    }
+
+    # exact match or subdomain of a blocked root
+    if d in blocked:
+        return True
+    for root in {
+        "yelp.com",
+        "linkedin.com",
+        "indeed.com",
+        "bbb.org",
+        "facebook.com",
+        "instagram.com",
+        "google.com",
+        "justia.com",
+        "ailalawyer.com",
+        "immigrationadvocates.org",
+        "law.cornell.edu",
+        "cornell.edu",
+    }:
+        if d.endswith("." + root):
+            return True
+
+    # block .gov entirely (not prospects)
+    if d.endswith(".gov"):
+        return True
+
+    return False
+
+
 def discover(cfg, dry_run: bool = False) -> List[Dict]:
     """Phase 1 — Keyword discovery.
 
@@ -114,6 +164,8 @@ def discover(cfg, dry_run: bool = False) -> List[Dict]:
             norm_url = _normalize_url(link)
             domain = _domain_from_url(norm_url)
             if not domain:
+                continue
+            if _is_blocked_domain(domain):
                 continue
 
             if domain in seen_domains:
