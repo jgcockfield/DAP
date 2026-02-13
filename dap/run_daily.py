@@ -131,6 +131,10 @@ def main() -> int:
             to_email = email_result.get("to_email", [])
             log_updates = email_result.get("log_updates", [])
 
+            # Basic rate limiting
+            MAX_EMAILS_PER_RUN = 5
+            to_email = to_email[:MAX_EMAILS_PER_RUN]
+
             # NOTE: SMTP send still not implemented; this is the queue size.
             emails_sent_count = len(to_email)
 
