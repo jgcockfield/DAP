@@ -106,6 +106,12 @@ def apply_enrichment(cfg: SheetsConfig, updates: List[Dict[str, Any]]) -> int:
                     updated[j] = v
                     changed = True
 
+            elif col == "status":
+                # Always update status (e.g., discovered -> contacted)
+                if updated[j] != v:
+                    updated[j] = v
+                    changed = True
+
             else:
                 # Only fill blanks for other fields
                 if not updated[j]:

@@ -140,8 +140,13 @@ def main() -> int:
 
             # Write send-log fields back to sheet (status/contacted + timestamps + emailed_to)
             if log_updates:
-                log_written = apply_enrichment(cfg, log_updates)
-                written_count += log_written
+                # Only log prospects that actually made it into the rate-limited queue
+                allowed_urls = {x["prospect"].get("website_url") for x in to_email}
+                filtered_logs = [u for u in log_updates if u.get("website_url") in allowed_urls]
+
+                if filtered_logs:
+                    log_written = apply_enrichment(cfg, filtered_logs)
+                    written_count += log_written
         else:
             emails_sent_count = 0
 
