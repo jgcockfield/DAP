@@ -25,6 +25,7 @@ def main() -> int:
     parser.add_argument("--no-email", action="store_true", help="Skip email stage (placeholder for now).")
     parser.add_argument("--limit", type=int, default=0, help="Limit number of URLs to crawl (0 = no limit).")
     parser.add_argument("--live", action="store_true", help="Actually send emails (safety gate).")
+    parser.add_argument("--max-emails", type=int, default=5, help="Max emails to process per run.")
     args = parser.parse_args()
 
     run_id = str(uuid.uuid4())
@@ -131,9 +132,8 @@ def main() -> int:
             to_email = email_result.get("to_email", [])
             log_updates = email_result.get("log_updates", [])
 
-            # Basic rate limiting
-            MAX_EMAILS_PER_RUN = 5
-            to_email = to_email[:MAX_EMAILS_PER_RUN]
+            # Basic rate limiting (configurable)
+            to_email = to_email[: args.max_emails]
 
             # NOTE: SMTP send still not implemented; this is the queue size.
             emails_sent_count = len(to_email)
