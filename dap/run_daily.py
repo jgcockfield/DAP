@@ -24,6 +24,7 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true", help="Run without external side effects.")
     parser.add_argument("--no-email", action="store_true", help="Skip email stage (placeholder for now).")
     parser.add_argument("--limit", type=int, default=0, help="Limit number of URLs to crawl (0 = no limit).")
+    parser.add_argument("--live", action="store_true", help="Actually send emails (safety gate).")
     args = parser.parse_args()
 
     run_id = str(uuid.uuid4())
@@ -124,12 +125,12 @@ def main() -> int:
 
         if not args.dry_run:
             written_count = apply_enrichment(cfg, updates)
-
         # email stage
-        if not args.dry_run and not args.no_email:
+        if not args.dry_run and not args.no_email and args.live:
             to_email = send_emails(cfg, prospects, updates, contacted_emails)
             emails_sent_count = len(to_email)
-            print("SEND_QUEUE_SAMPLE:", [(x["prospect"].get("company_name"), x["email"]) for x in to_email[:20]])
+        else:
+            emails_sent_count = 0
 
         finished_at = utc_now_iso()
 
