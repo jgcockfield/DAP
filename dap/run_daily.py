@@ -127,8 +127,17 @@ def main() -> int:
             written_count = apply_enrichment(cfg, updates)
         # email stage
         if not args.dry_run and not args.no_email and args.live:
-            to_email = send_emails(cfg, prospects, updates, contacted_emails)
+            email_result = send_emails(cfg, prospects, updates, contacted_emails)
+            to_email = email_result.get("to_email", [])
+            log_updates = email_result.get("log_updates", [])
+
+            # NOTE: SMTP send still not implemented; this is the queue size.
             emails_sent_count = len(to_email)
+
+            # Write send-log fields back to sheet (status/contacted + timestamps + emailed_to)
+            if log_updates:
+                log_written = apply_enrichment(cfg, log_updates)
+                written_count += log_written
         else:
             emails_sent_count = 0
 

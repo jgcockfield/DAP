@@ -94,6 +94,18 @@ def apply_enrichment(cfg: SheetsConfig, updates: List[Dict[str, Any]]) -> int:
                     updated[j] = v
                     changed = True
 
+            elif col == "last_emailed_at":
+                # Always update email timestamp
+                if updated[j] != v:
+                    updated[j] = v
+                    changed = True
+
+            elif col == "emailed_to":
+                # Always update last emailed recipient(s)
+                if updated[j] != v:
+                    updated[j] = v
+                    changed = True
+
             else:
                 # Only fill blanks for other fields
                 if not updated[j]:
