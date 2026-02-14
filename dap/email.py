@@ -26,7 +26,7 @@ def send_emails(
     now = _utc_now_iso()
 
     for p in prospects:
-        if p.get("status") == "contacted":
+        if (p.get("status") or "").strip().lower() == "contacted":
             continue
 
         raw = p.get("all_emails") or p.get("primary_email") or ""
@@ -47,6 +47,7 @@ def send_emails(
                 "status": "contacted",
                 "last_emailed_at": now,
                 "emailed_to": ",".join(selected),
+                "send_status": "queued",
             }
         )
 
