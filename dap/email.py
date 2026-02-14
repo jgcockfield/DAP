@@ -28,6 +28,8 @@ def send_emails(
     for p in prospects:
         if (p.get("status") or "").strip().lower() == "contacted":
             continue
+        if (p.get("send_status") or "").strip().lower() == "queued":
+            continue
 
         raw = p.get("all_emails") or p.get("primary_email") or ""
         emails = [e.strip() for e in raw.split(",") if e.strip()]
@@ -44,7 +46,6 @@ def send_emails(
         log_updates.append(
             {
                 "website_url": p.get("website_url", ""),
-                "status": "contacted",
                 "last_emailed_at": now,
                 "emailed_to": ",".join(selected),
                 "send_status": "queued",

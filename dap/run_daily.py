@@ -127,6 +127,13 @@ def main() -> int:
         if not args.dry_run:
             written_count = apply_enrichment(cfg, updates)
         # email stage
+        # DRY-RUN EMAIL SUMMARY (no side effects)
+        if args.dry_run and not args.no_email:
+            email_result = send_emails(cfg, prospects, updates, contacted_emails)
+            would_email = email_result.get("to_email", [])
+            print(f"[DRY-RUN] would_queue_emails={len(would_email)} (max_emails={args.max_emails})")
+
+        # email stage
         if not args.dry_run and not args.no_email and args.live:
             email_result = send_emails(cfg, prospects, updates, contacted_emails)
             to_email = email_result.get("to_email", [])
